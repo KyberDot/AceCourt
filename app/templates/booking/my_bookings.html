@@ -1,0 +1,219 @@
+{% extends "layout.html" %}
+
+{% block title %}My Bookings - AceCourt{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">My Bookings</h1>
+    
+    <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="upcoming-tab" data-bs-toggle="tab" data-bs-target="#upcoming" 
+                    type="button" role="tab" aria-controls="upcoming" aria-selected="true">
+                Upcoming Bookings
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="past-tab" data-bs-toggle="tab" data-bs-target="#past" 
+                    type="button" role="tab" aria-controls="past" aria-selected="false">
+                Past Bookings
+            </button>
+        </li>
+    </ul>
+    
+    <div class="tab-content" id="myTabContent">
+        <!-- Upcoming Bookings Tab -->
+        <div class="tab-pane fade show active" id="upcoming" role="tabpanel" aria-labelledby="upcoming-tab">
+            {% if upcoming_bookings %}
+                <div class="row">
+                    {% for booking in upcoming_bookings %}
+                    <div class="col-lg-6 mb-4">
+                        <div class="card booking-card h-100 {% if booking.status == 'cancelled' %}cancelled{% elif booking.status == 'pending' %}pending{% endif %}">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="card-title mb-0">{{ booking.court.name }}</h5>
+                                    <span class="badge {% if booking.status == 'confirmed' %}bg-success{% elif booking.status == 'pending' %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                                        {{ booking.status.title() }}
+                                    </span>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <p class="mb-1"><i class="far fa-calendar-alt"></i> {{ booking.start_time.strftime('%a, %b %d, %Y') }}</p>
+                                        <p class="mb-1"><i class="far fa-clock"></i> {{ booking.start_time.strftime('%I:%M %p') }} - {{ booking.end_time.strftime('%I:%M %p') }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p class="mb-1"><i class="fas fa-tennis-ball"></i> {{ booking.court.court_type.title() }} Court</p>
+                                        <p class="mb-1">
+                                            <i class="fas fa-map-marker-alt"></i> 
+                                            {% if booking.court.indoor %}Indoor{% else %}Outdoor{% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                {% if booking.notes %}
+                                <p class="card-text text-muted small mb-3">
+                                    <i class="fas fa-sticky-note"></i> Notes: {{ booking.notes }}
+                                </p>
+                                {% endif %}
+                                
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <p class="mb-0">
+                                            <strong>Booking #{{ booking.id }}</strong>
+                                            {% if booking.transaction %}
+                                                <span class="badge bg-success ms-2">
+                                                    <i class="fas fa-check-circle"></i> Paid
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-warning text-dark ms-2">
+                                                    <i class="fas fa-exclamation-circle"></i> Unpaid
+                                                </span>
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        {% if booking.can_cancel and booking.status != 'cancelled' %}
+                                        <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" 
+                                                data-bs-target="#cancelModal" 
+                                                data-booking-id="{{ booking.id }}"
+                                                data-booking-date="{{ booking.start_time.strftime('%a, %b %d, %Y') }}"
+                                                data-booking-time="{{ booking.start_time.strftime('%I:%M %p') }} - {{ booking.end_time.strftime('%I:%M %p') }}">
+                                            Cancel
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <div class="mb-3">
+                        <i class="fas fa-calendar-day fa-4x text-muted"></i>
+                    </div>
+                    <h4>No Upcoming Bookings</h4>
+                    <p class="text-muted">You don't have any upcoming court bookings.</p>
+                    <a href="{{ url_for('booking.calendar') }}" class="btn btn-primary mt-2">
+                        <i class="fas fa-calendar-plus"></i> Book a Court
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+        
+        <!-- Past Bookings Tab -->
+        <div class="tab-pane fade" id="past" role="tabpanel" aria-labelledby="past-tab">
+            {% if past_bookings %}
+                <div class="row">
+                    {% for booking in past_bookings %}
+                    <div class="col-lg-6 mb-4">
+                        <div class="card booking-card h-100 {% if booking.status == 'cancelled' %}cancelled{% endif %}" style="opacity: 0.8;">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h5 class="card-title mb-0">{{ booking.court.name }}</h5>
+                                    <span class="badge {% if booking.status == 'confirmed' %}bg-success{% elif booking.status == 'cancelled' %}bg-danger{% else %}bg-secondary{% endif %}">
+                                        {{ booking.status.title() }}
+                                    </span>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <p class="mb-1"><i class="far fa-calendar-alt"></i> {{ booking.start_time.strftime('%a, %b %d, %Y') }}</p>
+                                        <p class="mb-1"><i class="far fa-clock"></i> {{ booking.start_time.strftime('%I:%M %p') }} - {{ booking.end_time.strftime('%I:%M %p') }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p class="mb-1"><i class="fas fa-tennis-ball"></i> {{ booking.court.court_type.title() }} Court</p>
+                                        <p class="mb-1">
+                                            <i class="fas fa-map-marker-alt"></i> 
+                                            {% if booking.court.indoor %}Indoor{% else %}Outdoor{% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                {% if booking.notes %}
+                                <p class="card-text text-muted small mb-3">
+                                    <i class="fas fa-sticky-note"></i> Notes: {{ booking.notes }}
+                                </p>
+                                {% endif %}
+                                
+                                <p class="mb-0">
+                                    <strong>Booking #{{ booking.id }}</strong>
+                                    {% if booking.transaction %}
+                                        <span class="badge bg-success ms-2">
+                                            <i class="fas fa-check-circle"></i> Paid
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary ms-2">
+                                            <i class="fas fa-times-circle"></i> Not Paid
+                                        </span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <div class="mb-3">
+                        <i class="fas fa-history fa-4x text-muted"></i>
+                    </div>
+                    <h4>No Past Bookings</h4>
+                    <p class="text-muted">You don't have any past court bookings.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Cancel Booking Modal -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="cancelModalLabel">Cancel Booking</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to cancel this booking?</p>
+                <p><strong>Date: </strong><span id="modalDate"></span></p>
+                <p><strong>Time: </strong><span id="modalTime"></span></p>
+                
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    Cancellation policy: Full refund if cancelled at least 24 hours before the booking time.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Keep Booking</button>
+                <form id="cancelForm" method="POST">
+                    <button type="submit" class="btn btn-danger">Confirm Cancellation</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Script for cancel modal
+    const cancelModal = document.getElementById('cancelModal');
+    if (cancelModal) {
+        cancelModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const bookingId = button.getAttribute('data-booking-id');
+            const bookingDate = button.getAttribute('data-booking-date');
+            const bookingTime = button.getAttribute('data-booking-time');
+            
+            document.getElementById('modalDate').textContent = bookingDate;
+            document.getElementById('modalTime').textContent = bookingTime;
+            
+            const cancelForm = document.getElementById('cancelForm');
+            cancelForm.action = `/bookings/${bookingId}/cancel`;
+        });
+    }
+</script>
+{% endblock %}
