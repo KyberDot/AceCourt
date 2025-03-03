@@ -1,0 +1,99 @@
+{% extends "layout.html" %}
+
+{% block title %}Voucher Management - AceCourt Admin{% endblock %}
+
+{% block styles %}
+<style>
+    .voucher-card {
+        transition: all 0.3s ease;
+    }
+    
+    .voucher-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
+    .status-badge {
+        width: 80px;
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Voucher Management</h1>
+        <a href="{{ url_for('voucher.create') }}" class="btn btn-success">
+            <i class="fas fa-plus"></i> Create New Voucher
+        </a>
+    </div>
+    
+    <div class="row mb-4">
+        {% for voucher in vouchers %}
+        <div class="col-md-6 col-lg-4 mb-4">
+            <div class="card voucher-card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">{{ voucher.code }}</h5>
+                    <span class="badge status-badge 
+                          {% if voucher.status == 'active' %}bg-success
+                          {% elif voucher.status == 'expired' %}bg-warning text-dark
+                          {% else %}bg-danger{% endif %}">
+                        {{ voucher.status.title() }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h4 class="text-primary">${{ voucher.value }}</h4>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-6">
+                            <p class="mb-1"><strong>Usage:</strong> {{ voucher.current_uses }}/{{ voucher.max_uses }}</p>
+                            <p class="mb-1">
+                                <strong>Court:</strong> 
+                                {% if voucher.court %}{{ voucher.court.name }}{% else %}All Courts{% endif %}
+                            </p>
+                        </div>
+                        <div class="col-6">
+                            <p class="mb-1">
+                                <strong>Valid from:</strong> 
+                                {% if voucher.valid_from %}{{ voucher.valid_from.strftime('%Y-%m-%d') }}{% else %}Any time{% endif %}
+                            </p>
+                            <p class="mb-1">
+                                <strong>Valid until:</strong> 
+                                {% if voucher.valid_until %}{{ voucher.valid_until.strftime('%Y-%m-%d') }}{% else %}No expiry{% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <p class="text-muted small mt-2">Created: {{ voucher.created_at.strftime('%Y-%m-%d') }}</p>
+                </div>
+                <div class="card-footer">
+                    {% if voucher.status == 'active' %}
+                    <form action="{{ url_for('voucher.deactivate', voucher_id=voucher.id) }}" method="POST">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                            <i class="fas fa-ban"></i> Deactivate
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="fas fa-ticket-alt fa-4x text-muted mb-3"></i>
+                    <h4>No Vouchers Created</h4>
+                    <p>You haven't created any vouchers yet.</p>
+                    <a href="{{ url_for('voucher.create') }}" class="btn btn-primary mt-2">
+                        <i class="fas fa-plus"></i> Create First Voucher
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
