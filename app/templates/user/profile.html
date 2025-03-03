@@ -1,0 +1,136 @@
+{% extends "layout.html" %}
+
+{% block title %}My Profile - AceCourt{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">My Profile</h1>
+    
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Account Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <div class="avatar-placeholder mb-3">
+                            <span>{{ current_user.first_name[0] }}{{ current_user.last_name[0] }}</span>
+                        </div>
+                        <h5>{{ current_user.get_full_name() }}</h5>
+                        <p class="text-muted">Member since {{ current_user.created_at.strftime('%B %Y') }}</p>
+                    </div>
+                    
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Email</span>
+                            <span>{{ current_user.email }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Phone</span>
+                            <span>{{ current_user.phone or 'Not provided' }}</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('user.edit_profile') }}" class="btn btn-primary d-block">
+                        <i class="fas fa-edit"></i> Edit Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Recent Bookings</h5>
+                </div>
+                <div class="card-body">
+                    {% if recent_bookings %}
+                        <div class="list-group">
+                            {% for booking in recent_bookings %}
+                            <div class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">{{ booking.court.name }}</h6>
+                                        <p class="mb-1">
+                                            <i class="far fa-calendar-alt"></i> {{ booking.start_time.strftime('%a, %b %d, %Y') }}
+                                            <i class="far fa-clock ms-2"></i> {{ booking.start_time.strftime('%I:%M %p') }} - {{ booking.end_time.strftime('%I:%M %p') }}
+                                        </p>
+                                    </div>
+                                    <span class="badge {% if booking.status == 'confirmed' %}bg-success{% elif booking.status == 'pending' %}bg-warning text-dark{% else %}bg-danger{% endif %}">
+                                        {{ booking.status.title() }}
+                                    </span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="{{ url_for('booking.my_bookings') }}" class="btn btn-outline-primary btn-sm">
+                                View All Bookings
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <p>You don't have any recent bookings.</p>
+                            <a href="{{ url_for('booking.calendar') }}" class="btn btn-primary">
+                                <i class="fas fa-calendar-plus"></i> Book a Court
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Payment Methods</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-center">Manage your saved payment methods for faster checkout.</p>
+                            <a href="#" class="btn btn-outline-primary d-block">
+                                <i class="fas fa-credit-card"></i> Manage Payment Methods
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Security</h5>
+                        </div>
+                        <div class="card-body">
+                            <a href="{{ url_for('auth.change_password') }}" class="btn btn-outline-primary d-block mb-3">
+                                <i class="fas fa-lock"></i> Change Password
+                            </a>
+                            <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-danger d-block">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .avatar-placeholder {
+        width: 80px;
+        height: 80px;
+        background-color: #0d6efd;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        font-weight: bold;
+        margin: 0 auto;
+    }
+</style>
+{% endblock %}
