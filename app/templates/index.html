@@ -1,0 +1,82 @@
+{% extends "layout.html" %}
+
+{% block title %}AceCourt - Tennis Court Booking System{% endblock %}
+
+{% block content %}
+<div class="jumbotron bg-light p-5 rounded">
+    <div class="container">
+        <h1 class="display-4">Welcome to AceCourt</h1>
+        <p class="lead">The easiest way to book tennis courts online.</p>
+        <hr class="my-4">
+        <p>Browse available courts and book your next tennis session in minutes!</p>
+        <a class="btn btn-primary btn-lg" href="{{ url_for('booking.calendar') }}" role="button">
+            <i class="fas fa-calendar-alt"></i> Book Now
+        </a>
+        <a class="btn btn-outline-primary btn-lg" href="{{ url_for('court.list') }}" role="button">
+            <i class="fas fa-tennis-ball"></i> View Courts
+        </a>
+    </div>
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <h3 class="card-title"><i class="fas fa-calendar-check fa-2x text-primary mb-3"></i></h3>
+                <h5>Easy Booking</h5>
+                <p class="card-text">Book your preferred court with our simple booking system. View availability in real-time and secure your spot.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <h3 class="card-title"><i class="fas fa-coins fa-2x text-primary mb-3"></i></h3>
+                <h5>Flexible Payment Options</h5>
+                <p class="card-text">Pay securely online with various payment options or use promotional vouchers for discounts.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body text-center">
+                <h3 class="card-title"><i class="fas fa-bell fa-2x text-primary mb-3"></i></h3>
+                <h5>Reminders & Notifications</h5>
+                <p class="card-text">Get email reminders before your booking time. Never miss a game with our notification system.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-5 p-5 bg-light rounded">
+    <h2 class="text-center mb-4">Why Choose AceCourt?</h2>
+    <div class="row">
+        <div class="col-md-6">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item bg-transparent">
+                    <i class="fas fa-check-circle text-success"></i> Wide selection of courts
+                </li>
+                <li class="list-group-item bg-transparent">
+                    <i class="fas fa-check-circle text-success"></i> 24/7 online booking system
+                </li>
+                <li class="list-group-item bg-transparent">
+                    <i class="fas fa-check-circle text-success"></i> Competitive pricing
+                </li>
+            </ul>
+        </div>
+        <div class="col-md-6">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item bg-transparent">
+                    <i class="fas fa-check-circle text-success"></i> Easy cancellation policy
+                </li>
+                <li class="list-group-item bg-transparent">
+                    <i class="fas fa-check-circle text-success"></i> Clean and well-maintained facilities
+                </li>
+                <li class="list-group-item bg-transparent">
+                    <i class="fas fa-check-circle text-success"></i> Friendly customer support
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
